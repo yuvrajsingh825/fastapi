@@ -1,29 +1,17 @@
 from fastapi import FastAPI , HTTPException
 from database import students
 from models import Student
+from routers.students import router
+from fastapi import status
 app = FastAPI()
 @app.get("/")
 def home():
     return {"message": "Welcome to the student management API!"}
 
-
-@app.get("/students")
-def get_students():
-    return students
-
-@app.get("/students/{student_id}")
-def get_student(student_id: int):
-
-    if student_id not in students:
-        raise HTTPException(
-            status_code=404,
-            detail="Student not found"
-        )
-
-    return students[student_id]
+app.include_router(router)
 
 
-@app.post("/students")
+@app.post("/students", status_code=status.HTTP_201_CREATED)
 def create_student(student: Student):
     if student.id in students:
         raise HTTPException(
